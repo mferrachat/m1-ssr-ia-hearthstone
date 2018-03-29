@@ -4,6 +4,7 @@ def parser(fname):
 	f = open(fname, 'r')
 	dico = {}
 	table = {}
+	id_table = {}
 	i = 1
 	for l in f:
 		m = re.match('^([0-9]+) (O|M)([a-zA-Z0-9_\-\.:\'!?]+)',l)
@@ -14,9 +15,10 @@ def parser(fname):
 				dico[key] = set()
 			if name not in table:
 				table[name] = i
+				id_table[i] = name
 				i+=1
 			dico[key].add(table[name])
-	return dico, table
+	return dico, table, id_table
 
 def writeSet(dico, table, fname):
 	f = open(fname, 'w')
@@ -25,4 +27,14 @@ def writeSet(dico, table, fname):
 		line = ' '.join(map(str, sorted_a))
 		f.write(line+'\n')
 
-#def LCM(fname):
+def LCM_convert(input, output, table):
+	fin = open(input, 'r')
+	fout = open(output, 'w')
+	for l in fin:
+		m = re.match('.* (#SUP:) ([0-9]+)',l)
+		if m:
+			fout.write(m.group(2)+'\t')
+		m = re.finditer('([0-9]+)+ (#SUP)?',l)
+		for n in m:
+			fout.write(table[int(n.group(1))]+'\t')
+		fout.write('\n')
